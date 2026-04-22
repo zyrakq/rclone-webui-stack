@@ -1,0 +1,47 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${LOG_MAX_SIZE:-10m}
+    max-file: ${LOG_MAX_FILE:-3}
+    compress: ${LOG_COMPRESS:-true}
+services:
+  rclone-webui:
+    image: ${IMAGE:-rclone/rclone:latest}
+    container_name: rclone-webui
+    restart: unless-stopped
+    logging: *default-logging
+    stdin_open: true
+    tty: true
+    command: |
+      rcd
+        --rc-addr=${RCLONE_ADDR}
+        --rc-user=${RCLONE_USER:-admin}
+        --rc-pass=${RCLONE_PASS}
+        --rc-web-gui
+        --rc-web-gui-no-open-browser
+        --rc-allow-origin=${RCLONE_ALLOW_ORIGIN}
+        --log-level=${LOG_LEVEL:-INFO}
+    environment:
+      TZ: ${TZ:-Etc/UTC}
+      RCLONE_USER: ${RCLONE_USER:-admin}
+      RCLONE_PASS: ${RCLONE_PASS}
+      RCLONE_ADDR: ${RCLONE_ADDR}
+      RCLONE_ALLOW_ORIGIN: ${RCLONE_ALLOW_ORIGIN:-*}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - rclone-webui-config:/home/rclone/.config/rclone
+      - rclone-webui-data:/data
+    networks:
+      - step-ca-network
+volumes:
+  rclone-webui-config:
+    name: rclone-webui-config
+  rclone-webui-data:
+    name: rclone-webui-data
+networks:
+  step-ca-network:
+    external: true

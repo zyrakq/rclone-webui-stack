@@ -1,0 +1,4 @@
+services:
+  rclone-webui:
+    ports:
+      - 5572:5572

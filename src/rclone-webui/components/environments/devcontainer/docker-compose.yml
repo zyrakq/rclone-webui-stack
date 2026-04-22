@@ -1,0 +1,8 @@
+services:
+  rclone-webui:
+    networks:
+      - rclone-webui-workspace-network
+
+networks:
+  rclone-webui-workspace-network:
+    external: true
